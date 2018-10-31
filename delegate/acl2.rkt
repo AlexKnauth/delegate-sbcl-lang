@@ -5,17 +5,15 @@
 (require racket/system
          racket/port
          racket/file
-         syntax/parse/define)
+         syntax/parse/define
+         "util/which.rkt")
 
 (define-simple-macro (module-begin form:expr ...)
   (#%module-begin
    (delegate-acl2/repl '(form ...))))
 
 (define acl2
-  #;(find-executable-path "acl2")
-  #;(with-output-to-string (λ () (system "which acl2")))
-  #;(with-output-to-string (λ () (system "bash -c 'which acl2'")))
-  "$HOME/Documents/acl2/acl2/saved_acl2")
+  (which "saved_acl2"))
 
 ;; delegate-acl2/repl : [Listof S-Expr] -> Void
 (define (delegate-acl2/repl forms)

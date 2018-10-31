@@ -3,9 +3,19 @@ Racket #langs that delegate to sbcl, acl2, and acl2s
 
 ## Installation
 
+You can install `delegate-sbcl-lang` either through `raco` on the command line:
+
 ```
 $ raco pkg install https://github.com/AlexKnauth/delegate-sbcl-lang.git
 ```
+
+Or through DrRacket in **File** > **Package Manager** > **Do What I Mean**, and entering:
+
+```
+https://github.com/AlexKnauth/delegate-sbcl-lang.git
+```
+
+In the _Package Source_ field.
 
 ## Using the `#lang`s
 

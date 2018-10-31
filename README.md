@@ -4,7 +4,7 @@ Racket #langs that delegate to sbcl, acl2, and acl2s
 ## Installation
 
 ```
-$ raco pkg install https://github.com/AlexKnauth/delegate-sbcl-lang
+$ raco pkg install https://github.com/AlexKnauth/delegate-sbcl-lang.git
 ```
 
 ## Using the `#lang`s

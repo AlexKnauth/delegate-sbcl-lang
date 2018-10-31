@@ -3,19 +3,18 @@
 (provide (rename-out [module-begin #%module-begin]))
 
 (require racket/system
+         racket/string
          racket/port
          racket/file
-         syntax/parse/define)
+         syntax/parse/define
+         "util/which.rkt")
 
 (define-simple-macro (module-begin form:expr ...)
   (#%module-begin
    (delegate-acl2s/repl '(form ...))))
 
 (define acl2s
-  #;(find-executable-path "acl2s")
-  #;(with-output-to-string (λ () (system "which acl2s")))
-  #;(with-output-to-string (λ () (system "bash -c 'which acl2s'")))
-  "$HOME/bin/acl2s")
+  (which "acl2s"))
 
 ;; delegate-acl2s/repl : [Listof S-Expr] -> Void
 (define (delegate-acl2s/repl forms)

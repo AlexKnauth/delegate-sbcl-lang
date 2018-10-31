@@ -5,17 +5,15 @@
 (require racket/system
          racket/port
          racket/file
-         syntax/parse/define)
+         syntax/parse/define
+         "util/which.rkt")
 
 (define-simple-macro (module-begin form:expr ...)
   (#%module-begin
    (delegate-sbcl/repl '(form ...))))
 
 (define sbcl
-  #;(find-executable-path "sbcl")
-  #;(with-output-to-string (λ () (system "which sbcl")))
-  #;(with-output-to-string (λ () (system "bash -c 'which sbcl'")))
-  "/usr/local/bin/sbcl")
+  (which "sbcl"))
 
 ;; delegate-sbcl/repl : [Listof S-Expr] -> Void
 (define (delegate-sbcl/repl forms)

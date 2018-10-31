@@ -4,7 +4,6 @@
 
 (require racket/system
          racket/port
-         racket/file
          syntax/parse/define
          "util/which.rkt")
 

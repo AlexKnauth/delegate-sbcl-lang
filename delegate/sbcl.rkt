@@ -3,7 +3,6 @@
 (provide (rename-out [module-begin #%module-begin]))
 
 (require racket/system
-         racket/port
          racket/file
          syntax/parse/define
          "util/which.rkt")

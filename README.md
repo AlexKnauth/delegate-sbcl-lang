@@ -36,7 +36,7 @@ $ raco pkg install https://github.com/AlexKnauth/delegate-sbcl-lang
 ### `#lang delegate/acl2s`
 
 ```racket
-#lang delegate/acl2
+#lang delegate/acl2s
 
 (defunc f (x)
   :input-contract (natp x)

@@ -9,16 +9,17 @@
          syntax/parse/define
          json
          "util/which.rkt"
-         "util/provide-unprefix.rkt"
-         (prefix-in acl2s: "util/scope.rkt")
+         "util/write-whitespace-toward.rkt"
          (for-syntax racket/base
                      syntax/parse))
+(module+ test
+  (require rackunit))
 
 ;; -----------------------------------------------
 
-(define-simple-macro (module-begin s:str)
+(define-simple-macro (module-begin src ln:nat col:nat pos:nat s:str)
   (#%module-begin
-   (delegate-cedille 's)))
+   (delegate-cedille 'src 'ln 'col 'pos 's)))
 
 ;; -----------------------------------------------
 
@@ -27,10 +28,11 @@
 (define cedille
   (which "cedille"))
 
-;; delegate-cedille : String -> Void
-(define (delegate-cedille s)
+;; delegate-cedille : Any Nat Nat Nat String -> Void
+(define (delegate-cedille src ln col pos s)
   (define tmp (make-temporary-file))
   (define tmp-out (open-output-file tmp #:exists 'replace))
+  (write-whitespace-toward ln col pos tmp-out)
   (write-string s tmp-out)
   (close-output-port tmp-out)
   ;; ----------
@@ -60,3 +62,4 @@
      (consume-progress-lines in)]
     [else
      (void)]))
+

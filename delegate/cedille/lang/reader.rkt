@@ -10,7 +10,17 @@
    (literal-read-syntax #f in)))
  
 (define (literal-read-syntax src in)
-  (with-syntax ([str (port->string in)])
+  (port-count-lines! in)
+  (define-values [ln col pos] (port-next-location in))
+  (with-syntax ([src src]
+                [ln ln]
+                [col col]
+                [pos pos]
+                [str (port->string in)])
     (strip-context
      #'(module anything delegate/cedille
+         src
+         ln
+         col
+         pos
          str))))

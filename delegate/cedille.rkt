@@ -2,12 +2,13 @@
 
 (provide (rename-out [module-begin #%module-begin]))
 
-(require racket/list
-         racket/file
+(require racket/file
+         racket/list
+         racket/match
          racket/system
-         racket/port
          syntax/parse/define
          json
+         "cedille/check.rkt"
          "util/which.rkt"
          "util/write-whitespace-toward.rkt"
          (for-syntax racket/base
@@ -23,7 +24,7 @@
 
 ;; -----------------------------------------------
 
-;; Delagating to ACL2s
+;; Delagating to Cedille
 
 (define cedille
   (which "cedille"))
@@ -36,30 +37,30 @@
   (write-string s tmp-out)
   (close-output-port tmp-out)
   ;; ----------
-  (define-values [my-in their-out] (make-pipe))
-  (define command
-    (format "~v" cedille))
-  (define in
-    (open-input-string
-     (format "check§~a\n" (path->string tmp))))
-  (void (parameterize ([current-input-port in]
-                       [current-output-port their-out])
-          (system command)))
-  ;; get rid of lines that start with "progress: "
-  (consume-progress-lines my-in)
-  ;; read a JSON value
-  (read-json my-in))
+  (define cedille-json
+    (cedille-check tmp))
+  ;; handle the JSON value
+  (handle-cedille-json cedille-json))
 
-;; consume-progress-lines : InputPort -> Void
-;; get rid of lines that start with "progress: "
-(define (consume-progress-lines in)
-  (define progress-start "progress: ")
-  (define would-be-progress (peek-string (string-length progress-start) 0 in))
-  (cond
-    [(and (string? would-be-progress)
-          (string=? would-be-progress progress-start))
-     (read-line in)
-     (consume-progress-lines in)]
-    [else
-     (void)]))
+;; -----------------------------------------------
+
+;; A CedilleJson is a Json object:
+;;   {
+;;     spans: SpansJson
+;;   }
+;; A SpansJson is a Json array of SpanJson
+;; A SpanJson is a Json array:
+;;   [String, Pos, Pos, ???]
+
+;; handle-cedille-json : CedilleJson -> Any
+(define (handle-cedille-json cj)
+  (match cj
+    [(hash-table ['spans ssj])
+     (map handle-span-json ssj)]))
+
+;; handle-span-json : SpanJson -> Any
+(define (handle-span-json sj)
+  (match sj
+    [(list desc start end _)
+     (list desc start (- end start))]))
 

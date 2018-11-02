@@ -1,6 +1,7 @@
 #lang racket/base
 
-(provide cedille-check)
+(provide cedille-check
+         cedille-check/contents)
 
 (require racket/string
          racket/system
@@ -23,13 +24,31 @@
 
 ;; Delegating to Cedille to Check a File
 
-(define cedille
-  (which "cedille"))
+;; cedille-check/contents : String -> CedilleJson
+(define (cedille-check/contents contents
+                                #:cedille [cedille (which "cedille")])
+  (define tmp (format "/tmp/fifo~a" (random (expt 2 31))))
+  (system (format "mkfifo ~v" tmp))
+  (process/ports #f (open-input-string contents) #f (format "cat > ~v" tmp))
+  (define-values [my-in their-out] (make-pipe))
+  (define command (format "~v" cedille))
+  (define in
+    (open-input-string
+     (format "check§~a\n" tmp)))
+  (void (parameterize ([current-input-port in]
+                       [current-output-port their-out])
+          (system command)))
+  (close-output-port their-out)
+  ;; get rid of lines that start with "progress: "
+  (consume-progress-lines my-in)
+  ;; read a JSON value
+  (read-json my-in))
 
 ;; cedille-check : Path -> CedilleJson
 ;; Calls the cedille compiler with a "check" command
 ;; on the given file.
-(define (cedille-check file-path)
+(define (cedille-check file-path
+                       #:cedille [cedille (which "cedille")])
   (define-values [my-in their-out] (make-pipe))
   (define command (format "~v" cedille))
   (define file-string (path->string file-path))
